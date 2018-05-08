@@ -37,3 +37,16 @@ def insert_user(email,kcmc,kskm):
     cursor.execute(sql%data)
     connection.commit()
     print('添加用户成功')
+
+def select_distinct_info():
+    sql = "select distinct kskm,kcmc from user"
+    cursor.execute(sql)
+    connection.commit()
+    return cursor.fetchall()
+
+def select_user_mail(kskm,kcmc):
+    sql = "select email from user where kskm = '%s' and kcmc = '%s'"
+    data = (kskm,kcmc)
+    cursor.execute(sql%data)
+    connection.commit()
+    return cursor.fetchall()

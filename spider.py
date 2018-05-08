@@ -6,7 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 session = requests.session()
-def spider(kskm,kc,email):
+def spider(kskm,kc):
     currenttime = time.localtime()
     startTime = time.strftime("%Y-%m-%d", currenttime)
     year = time.strftime("%Y",currenttime)
@@ -54,18 +54,23 @@ def spider(kskm,kc,email):
                     ksrq = detailjson['data'][j]['ksrq']  #考试日期
                     sqrs = detailjson['data'][j]['sqrs']  #预约人数
                     if (int(sqrs) != 0):
+                        print (kcmc,ksrq,sqrs)
                         if mydao.is_new(kcmc,ksrq,kskm) == True:
+                            print ("是最新的")
                             text = text + kcmc + ' ' + ksrq + ' ' + detailjson['data'][j]['kscx'] + ' 科目'+str(kskm)+'\n'
                             flag = 1
                             mydao.insert_result(kcmc,ksrq,kskm)
                             print (kcmc,ksrq,sqrs)
                 print(text)
                 if flag == 1:
-                    sendmail(email,text,'有新的科目'+str(kskm)+'考试安排出来了',' ')
-            
+                    emails = mydao.select_user_mail(kskm,kc)
+                    for email in emails:
+                        print (email)
+                        sendmail(email['email'],text,'有新的科目'+str(kskm)+'考试安排出来了',' ')
+                        
 if __name__ == '__main__':
-    users = mydao.select_user()
+    infs = mydao.select_distinct_info()
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-    for user in users:
-        spider(user['kskm'],user['kcmc'],user['email'])
+    for inf in infs:
+        spider(inf['kskm'],inf['kcmc'])
 
